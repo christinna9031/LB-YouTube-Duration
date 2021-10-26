@@ -1,0 +1,54 @@
+[extension_name]
+Get YouTube Video Duration
+[insert_external]
+<div><p>YouTube Video Duration by Christina K. is installed. </p></div>
+<!--
+ * @name: YouTube Video Duration, @version: 1.1 , @author: Christina K.
+ * -->
+[insert_command]
+lioranboardclient.send('{"type":"MESSAGE","topic":"ExtensionCommand","name":"YouTube Video Duration","boxcount":2,"boxname1":"url","boxtype1":"string","boxname2":"variable","boxtype2":"string"}');
+[insert_hook]
+case "YouTubeVideoDuration":{
+	LBGetYDduration(LioranBoardJSON.url,LioranBoardJSON.variable)
+}break
+[insert_script]
+function LBGetYDduration(url, variable) {
+  function YouTubeGetID(url) {
+    var ID = '';
+    url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+    if (url[2] !== undefined) {
+      ID = url[2].split(/[^0-9a-z_\-]/i);
+      ID = ID[0];
+    } else {
+      ID = url;
+    }
+    return ID;
+  }
+
+  const data = {
+    key: 'AIzaSyBhhQp0IhB2kKhbkS6BNZ9odEhQpbYMiTY',
+    id: YouTubeGetID(url),
+    part: 'contentDetails',
+  };
+  const YTbase_url = "https://www.googleapis.com/youtube/v3/videos";
+  const YTurl = new URL(YTbase_url);
+  Object.entries(data).forEach(([key, value]) => YTurl.searchParams.append(key, value));
+  const YTduration = fetch(YTurl, {
+    method: 'GET'
+  });
+
+  YTduration.then(response => {
+    return response.json();
+  }).then(data => {
+    try {
+      data = data.items[0].contentDetails.duration;
+      data = moment.duration(data);
+      data = data._milliseconds;
+      lioranboardclient.send('{"type":"MESSAGE","topic":"SetValue","valuename":"' + variable + '","value":' + data + '}');
+    } catch (err) {
+      lioranboardclient.send('{"type":"MESSAGE","topic":"AlertMessage","message":"Error fetching YouTube video duration."}')
+    }
+
+  });
+}
+[insert_over]
