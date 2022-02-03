@@ -1,5 +1,5 @@
 # LB-YouTube-Duration
- Retrieve duration of any YouTube video in milliseconds.
+ Retrieve duration of any YouTube video in milliseconds in LioranBoard 1 or LioranBoard 2.
 
 **Special thanks goes to [MisterK](twitch.tv/misterk_qc) for migrating the extension to LioranBoard 2.** 
 
